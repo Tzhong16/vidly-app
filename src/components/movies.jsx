@@ -95,32 +95,34 @@ class Movies extends Component {
 
     return (
       <React.Fragment>
-        <div className="row">
-          <div className="col-3">
-            <ListGroup
-              items={this.state.genres}
-              currentGenre={this.state.currentGenre}
-              selectItem={this.state.selectGenre}
-              onItemSelect={this.handleGenreSelect}
-            />
+        <main className="container">
+          <div className="row">
+            <div className="col-3">
+              <ListGroup
+                items={this.state.genres}
+                currentGenre={this.state.currentGenre}
+                selectItem={this.state.selectGenre}
+                onItemSelect={this.handleGenreSelect}
+              />
+            </div>
+            <div className="col">
+              <p>Showing {totalCount} movies in database. </p>
+              <MoviesTable
+                movies={movies}
+                sortColumn={sortColumn}
+                onLiked={this.handleLiked}
+                onDeleted={this.handleDelete}
+                onSort={this.handleSort}
+              />
+              <Pagination
+                pageSize={pageSize}
+                itemsCount={totalCount}
+                currentPage={currentPage}
+                onPageChange={this.handlePageChange}
+              />
+            </div>
           </div>
-          <div className="col">
-            <p>Showing {totalCount} movies in database. </p>
-            <MoviesTable
-              movies={movies}
-              sortColumn={sortColumn}
-              onLiked={this.handleLiked}
-              onDeleted={this.handleDelete}
-              onSort={this.handleSort}
-            />
-            <Pagination
-              pageSize={pageSize}
-              itemsCount={totalCount}
-              currentPage={currentPage}
-              onPageChange={this.handlePageChange}
-            />
-          </div>
-        </div>
+        </main>
       </React.Fragment>
     );
   }
