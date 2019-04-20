@@ -5,6 +5,7 @@ import Movies from './components/movies';
 import Customers from './components/customers';
 import Rentals from './components/rentals';
 import MovieForm from './components/movieForm';
+import RegisterForm from './components/registerForm';
 import LoginForm from './components/loginForm';
 import NotFound from './components/notFound';
 import NavBar from './components/navBar';
@@ -15,7 +16,9 @@ class App extends Component {
       <React.Fragment>
         <NavBar />
         <Switch>
+          <Route path="/register" component={RegisterForm} />
           <Route path="/login" component={LoginForm} />
+          {/* <Route path="/movies/new" component={MovieForm} /> */}
           <Route path="/movies/:id" component={MovieForm} />
           <Route path="/movies" component={Movies} />
           <Route path="/customers" component={Customers} />

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import Joi from 'joi-browser';
+import Input from './input';
+import Select from './select';
 
 class Form extends Component {
   state = {
@@ -10,9 +12,9 @@ class Form extends Component {
   validate = () => {
     const options = { abortEarly: false };
     const { error } = Joi.validate(this.state.data, this.schema, options);
-    //const result = Joi.validate(this.state.data, this.schema, options);
+    const result = Joi.validate(this.state.data, this.schema, options);
 
-    //console.log(result);
+    console.log(result);
     if (!error) return null;
 
     const errors = {};
@@ -57,6 +59,7 @@ class Form extends Component {
 
     const data = { ...this.state.data };
     data[input.name] = input.value;
+
     this.setState({ data, errors });
   };
 
@@ -65,6 +68,36 @@ class Form extends Component {
       <button className="btn btn-primary" disabled={this.validate()}>
         {label}
       </button>
+    );
+  }
+
+  renderSelect(name, label, options) {
+    const { data, errors } = this.state;
+
+    return (
+      <Select
+        name={name}
+        value={data[name]}
+        label={label}
+        options={options}
+        onChange={this.handleChange}
+        error={errors[name]}
+      />
+    );
+  }
+
+  renderInput(name, label, type = 'text') {
+    const { data, errors } = this.state;
+
+    return (
+      <Input
+        name={name}
+        type={type}
+        value={data[name]}
+        label={label}
+        onChange={this.handleChange}
+        error={errors[name]}
+      />
     );
   }
 }
