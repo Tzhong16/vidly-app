@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { getMovies } from '../services/fakeMovieService';
 import Pagination from './common/pagination';
 import { paginate } from '../utils/paginate';
 import ListGroup from './common/listGroup';
-import { getGenres } from '../services/fakeGenreService';
+import { getGenres } from '../services/genreService';
+import { getMovies, deleteMovie } from '../services/movieService';
 import { Link } from 'react-router-dom';
 import MoviesTable from './moviesTable';
 import SearchBox from './common/searchBox';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 
 class Movies extends Component {
   state = {
@@ -20,14 +21,27 @@ class Movies extends Component {
     sortColumn: { path: 'title', order: 'asc' }
   };
 
-  componentDidMount() {
-    const genres = [{ _id: '', name: 'All Genre' }, ...getGenres()];
-    this.setState({ genres, movies: getMovies() });
+  async componentDidMount() {
+    const { data } = await getGenres();
+    const genres = [{ _id: '', name: 'All Genre' }, ...data];
+    const { data: movies } = await getMovies();
+    this.setState({ genres, movies });
   }
 
-  handleDelete = movie => {
-    const movies = this.state.movies.filter(m => m._id !== movie._id);
+  handleDelete = async movie => {
+    const originalMovies = this.state.movies;
+
+    const movies = originalMovies.filter(m => m._id !== movie._id);
     this.setState({ movies });
+
+    try {
+      await deleteMovie(movie._id);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404)
+        toast.error('This movie has been already been deleted');
+
+      this.setState({ movies: originalMovies });
+    }
   };
 
   handleLiked = movie => {
@@ -90,7 +104,8 @@ class Movies extends Component {
   render() {
     const { length: count } = this.state.movies;
     const { pageSize, currentPage, sortColumn, searchQuery } = this.state;
-    if (count === 0) return <p>There are no movies in database.</p>;
+    const { user } = this.props;
+    // if (count === 0) return <p>There are no movies in database.</p>;
 
     // if (!currentGenre) {
     //   let filetermovies = movies.filter(m => m.genre._id === currentGenre._id);
@@ -119,13 +134,15 @@ class Movies extends Component {
               />
             </div>
             <div className="col">
-              <Link
-                to="/movies/new"
-                className="btn btn-primary "
-                style={{ marginBottom: 20 }}
-              >
-                New Movie
-              </Link>
+              {user && (
+                <Link
+                  to="/movies/new"
+                  className="btn btn-primary "
+                  style={{ marginBottom: 20 }}
+                >
+                  New Movie
+                </Link>
+              )}
               <p>Showing {totalCount} movies in database. </p>
               <SearchBox value={searchQuery} onChange={this.handleSearch} />
               <MoviesTable
